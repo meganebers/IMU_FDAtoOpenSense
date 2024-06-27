@@ -20,7 +20,7 @@ def quaternion_to_rotation_matrix(q):
     return R
 
 # Function to process each DataFrame and save the output
-def process_dataframe(df, imu_sensors, output_folder):
+def process_dataframe(df, imu_sensors, output_folder, SUBJ):
     for sensor in imu_sensors:
 
         # Filter columns for the specific IMU sensor
@@ -57,7 +57,7 @@ def process_dataframe(df, imu_sensors, output_folder):
         ]
 
         output_data = pd.DataFrame(index=range(5+data.shape[0]), columns=range(len(header_string))) 
-        output_data.loc[0, 0] = f"// Start Time: {df['Time'].iloc[0]}"
+        output_data.loc[0, 0] = f"// Start Time: Unknown"
         output_data.loc[1, 0] = "// Update Rate: 100.00 Hz"
         output_data.loc[2, 0] = "// Filter Profile: human (46.1)"
         output_data.loc[3, 0] = "// Option Flags: AHS Disabled ICC Disabled"
@@ -93,11 +93,11 @@ def process_dataframe(df, imu_sensors, output_folder):
             output_data.loc[i + 6, :] = row
 
         # Save to file
-        output_file = os.path.join(output_folder, f"{sensor}.txt")
+        output_file = os.path.join(output_folder, f"{SUBJ}_{sensor}.txt")
         output_data.to_csv(output_file, index=False, header=False, sep='\t')
 
 # Main function to read CSV files and process them
-def main(input_folder, imu_sensors, output_folder):
+def main(input_folder, imu_sensors, output_folder, SUBJ):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
@@ -105,12 +105,12 @@ def main(input_folder, imu_sensors, output_folder):
         if file.endswith('.csv'):
             file_path = os.path.join(input_folder, file)
             df = pd.read_csv(file_path)
-            process_dataframe(df, imu_sensors, output_folder)
+            process_dataframe(df, imu_sensors, output_folder, SUBJ)
 
 # SETUP
 SUBJ = 'NLS002'
 imu_sensors = ['LowerBack', 'R_DorsalFoot', 'R_Wrist', 'L_DorsalFoot', 'L_Wrist', 'R_Ankle', 'R_MidLatThigh', 'L_Ankle', 'L_MidLatThigh', 'Xiphoid', 'R_LatShank', 'Forehead', 'L_LatShank']  # List of IMU sensor names
-input_folder = '/home/mebers/code/biomech/Parkinsons_Data/NLS002'
-output_folder = input_folder+'/OpenSense'
+input_folder = 'C:/Users/Admin/Desktop/Ebers/FDA_PD_Data/PD'
+output_folder = os.path.join(input_folder, 'OpenSense', SUBJ)
 
-main(input_folder, imu_sensors, output_folder)
+main(input_folder, imu_sensors, output_folder, SUBJ)
