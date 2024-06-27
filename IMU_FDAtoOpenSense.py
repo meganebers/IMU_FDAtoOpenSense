@@ -20,7 +20,7 @@ def quaternion_to_rotation_matrix(q):
     return R
 
 # Function to process each DataFrame and save the output
-def process_dataframe(df, imu_sensors, output_folder, SUBJ):
+def process_dataframe(df, imu_sensors, output_folder, SUBJ, TRIAL):
     for sensor in imu_sensors:
 
         # Filter columns for the specific IMU sensor
@@ -93,24 +93,31 @@ def process_dataframe(df, imu_sensors, output_folder, SUBJ):
             output_data.loc[i + 6, :] = row
 
         # Save to file
-        output_file = os.path.join(output_folder, f"{SUBJ}_{sensor}.txt")
+        output_file = os.path.join(output_folder, f"{SUBJ}_{TRIAL}_{sensor}.txt")
         output_data.to_csv(output_file, index=False, header=False, sep='\t')
 
 # Main function to read CSV files and process them
-def main(input_folder, imu_sensors, output_folder, SUBJ):
+def main(input_folder, imu_sensors, output_folder, SUBJ, TRIAL):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     for file in os.listdir(input_folder):
-        if file.endswith('.csv'):
+        file_found = False
+
+        if file.endswith('.csv') and TRIAL in file:
             file_path = os.path.join(input_folder, file)
             df = pd.read_csv(file_path)
-            process_dataframe(df, imu_sensors, output_folder, SUBJ)
+            process_dataframe(df, imu_sensors, output_folder, SUBJ, TRIAL)
+
+        if not file_found:
+            raise FileNotFoundError(f"No CSV file matching the trial identifier '{TRIAL}' was found in the folder '{input_folder}'.")
+
 
 # SETUP
 SUBJ = 'NLS002'
+TRIAL = 'SelfPace'
 imu_sensors = ['LowerBack', 'R_DorsalFoot', 'R_Wrist', 'L_DorsalFoot', 'L_Wrist', 'R_Ankle', 'R_MidLatThigh', 'L_Ankle', 'L_MidLatThigh', 'Xiphoid', 'R_LatShank', 'Forehead', 'L_LatShank']  # List of IMU sensor names
-input_folder = 'C:/Users/Admin/Desktop/Ebers/FDA_PD_Data/PD'
+input_folder = '/home/mebers/code/biomech/Parkinsons_Data/NLS002'
 output_folder = os.path.join(input_folder, 'OpenSense', SUBJ)
 
-main(input_folder, imu_sensors, output_folder, SUBJ)
+main(input_folder, imu_sensors, output_folder, SUBJ, TRIAL)
