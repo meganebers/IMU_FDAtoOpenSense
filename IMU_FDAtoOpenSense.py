@@ -104,20 +104,20 @@ def main(input_folder, imu_sensors, output_folder, SUBJ, TRIAL):
     for file in os.listdir(input_folder):
         file_found = False
 
-        if file.endswith('.csv') and TRIAL in file:
+        if SUBJ and TRIAL in file: #file.endswith('.csv') and 
             file_path = os.path.join(input_folder, file)
-            df = pd.read_csv(file_path)
+            df = pd.read_excel(file_path) #read_csv
             process_dataframe(df, imu_sensors, output_folder, SUBJ, TRIAL)
 
         if not file_found:
-            raise FileNotFoundError(f"No CSV file matching the trial identifier '{TRIAL}' was found in the folder '{input_folder}'.")
+            raise FileNotFoundError(f"No file matching the trial identifier '{TRIAL}' was found in the folder '{input_folder}'.")
 
 
 # SETUP
 SUBJ = 'NLS002'
 TRIAL = 'SelfPace'
 imu_sensors = ['LowerBack', 'R_DorsalFoot', 'R_Wrist', 'L_DorsalFoot', 'L_Wrist', 'R_Ankle', 'R_MidLatThigh', 'L_Ankle', 'L_MidLatThigh', 'Xiphoid', 'R_LatShank', 'Forehead', 'L_LatShank']  # List of IMU sensor names
-input_folder = '/home/mebers/code/biomech/Parkinsons_Data/NLS002'
+input_folder = r'C:\Users\Admin\Desktop\Ebers\FDA_PD_Data\PD'
 output_folder = os.path.join(input_folder, 'OpenSense', SUBJ)
 
 main(input_folder, imu_sensors, output_folder, SUBJ, TRIAL)
