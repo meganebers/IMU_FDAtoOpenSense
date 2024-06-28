@@ -18,8 +18,14 @@ imu_to_opensim = {
 }
 
 # Function to process the CSV file and generate the output text file
-def reformat_data(input_csv, output_txt):
-    with open(input_csv, mode='r') as infile, open(output_txt, mode='w') as outfile:
+def reformat_data(input_csv, output_folder):
+    # Check if the output folder exists, if not, create it
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    output_sto = os.path.join(output_folder, f'{SUBJ}_{TRIAL}.sto')
+
+    with open(input_csv, mode='r') as infile, open(output_sto, mode='w') as outfile:
         reader = csv.DictReader(infile)
         
         # Writing the header lines
@@ -46,12 +52,11 @@ def reformat_data(input_csv, output_txt):
                 data.append(quaternion)
             outfile.write("\t".join(data) + "\n")
 
-SUBJ = 'NLS002'
+SUBJ = 'HC100'
 TRIAL = 'SelfPace'
 
 input_folder = '/home/mebers/IMU_FDAtoOpenSense'
 output_folder = os.path.join(input_folder, 'OpenSense', SUBJ)
 
 input_csv = os.path.join(input_folder, SUBJ, f'{SUBJ}_{TRIAL}.csv')
-output_file = f'{SUBJ}_{TRIAL}.sto'  # Replace with the desired output text file path
-reformat_data(input_csv, output_file)
+reformat_data(input_csv, output_folder)
